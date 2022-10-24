@@ -17,7 +17,7 @@
       Peek(): Returns the smallest T in the heap, if applicable
       Pop(): Returns the smallest T in the heap and removes it from the heap, if applicable
       Add(T): Adds to the heap
-      Find(T): returns if T was found in the heap
+      Find(T): returns true if T was found in the heap
  */
 
 public class MinHeap<T>
