@@ -49,14 +49,21 @@ namespace AStar {
 
         public NodeMap GenerateNodeMap(
             Vector2 origin, Vector2Int size, float spacing, Transform parent,
-            string startTag, string goalTag) {
+            string startTag, string goalTag, string obstacleTag) {
             NodeMap map = new NodeMap(origin, size);
 
             for (int y = 0; y < size.y; y++) {
                 for (int x = 0; x < size.x; x++) {
                     GameObject go = new GameObject();
                     Node node = go.AddComponent<Node>();
-                    node.Generate(spacing, new Vector2Int(x, y), startTag, goalTag, ref map);
+                    node.Generate(
+                        spacing,
+                        new Vector2Int(x, y),
+                        startTag,
+                        goalTag,
+                        obstacleTag,
+                        ref map
+                    );
                     map.nodes[x, y] = node;
                     go.transform.position = new Vector3(
                         x + origin.x - (size.x / 2),
@@ -105,6 +112,8 @@ namespace AStar {
 
                     // Get the neighbor and calculate new g and f scores
                     Node neighbor = map[x, y];
+                    // Check if one can go there
+                    if (neighbor.IsObstacle) continue;
                     CalculateNeighborWeights(
                         ref cameFrom, ref openSet, ref current, ref neighbor, ref goal);
                 }

@@ -10,6 +10,7 @@ namespace AStar {
         public float cellSize;
         public string startingTag;
         public string goalTag;
+        public string obstacleTag;
         [Header("Debug")]
         public bool enableDebugLine;
 
@@ -22,7 +23,8 @@ namespace AStar {
                 this.cellSize,
                 this.nodeParent,
                 this.startingTag,
-                this.goalTag
+                this.goalTag,
+                this.obstacleTag
             );
 
             if (this.map == null) {

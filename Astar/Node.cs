@@ -39,18 +39,23 @@ namespace AStar {
             get { return this.transform.position; }
             set { this.transform.position = value; }
         }
-        [HideInInspector] public float fCost = float.MaxValue;
-        [HideInInspector] public float gcost = float.MaxValue;
+        [HideInInspector] public float fCost = float.MaxValue / 2;
+        [HideInInspector] public float gcost = float.MaxValue / 2;
         [HideInInspector] public Vector2Int index;
+        [HideInInspector] public bool IsObstacle { get { return this.isObstacle; } }
         private Rigidbody2D rb = null;
         private BoxCollider2D bc = null;
         private NodeData nodeData = null;
         private NodeMap map = null;
+        private bool isObstacle = false;
         private string startTag;
         private string goalTag;
+        private string obstacleTag;
 
         public void Generate(
-            float size, Vector2Int index, string startTag, string goalTag, ref NodeMap map) {
+            float size, Vector2Int index, string startTag,
+            string goalTag, string obstacleTag, ref NodeMap map
+        ) {
             this.rb = this.gameObject.AddComponent<Rigidbody2D>();
             this.rb.bodyType = RigidbodyType2D.Kinematic;
             this.rb.freezeRotation = true;
@@ -61,11 +66,12 @@ namespace AStar {
             this.map = map;
             this.startTag = startTag;
             this.goalTag = goalTag;
+            this.obstacleTag = obstacleTag;
         }
 
         public void Reset() {
-            this.fCost = float.MaxValue;
-            this.gcost = float.MaxValue;
+            this.fCost = float.MaxValue / 2;
+            this.gcost = float.MaxValue / 2;
         }
 
         private void OnDrawGizmos() {
@@ -96,13 +102,19 @@ namespace AStar {
         }
 
         private void SetNode(string tag) {
+            this.nodeData = AStar.instance.RetrieveNodeData(tag);
+            if (tag == obstacleTag) {
+                this.isObstacle = true;
+                return;
+            }
             if (tag == startTag) {
                 this.map.start = this;
+                this.isObstacle = false;
             }
             if (tag == goalTag) {
                 this.map.goal = this;
+                this.isObstacle = false;
             }
-            this.nodeData = AStar.instance.RetrieveNodeData(tag);
         }
 
         private void UnassignNode() {
