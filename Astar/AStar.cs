@@ -71,6 +71,7 @@ namespace AStar {
         }
 
         public List<Vector2> FindPath(ref NodeMap map, ref Node origin, ref Node goal) {
+            if (origin == null || goal == null || map == null) return null;
             // Reset all nodes
             map.Reset();
 
@@ -121,8 +122,10 @@ namespace AStar {
         }
 
         public void DisplayLine(List<Vector2> path) {
+            this.lineRenderer.positionCount = path.Count;
             for (int i = 0; i < path.Count; i++) {
-                this.lineRenderer.SetPosition(i, path[path.Count - i - 1]);
+                Vector2 position = path[path.Count - i - 1];
+                this.lineRenderer.SetPosition(i, new Vector3(position.x, position.y, 0));
             }
             this.lineRenderer.gameObject.SetActive(true);
         }

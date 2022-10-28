@@ -95,50 +95,37 @@ namespace AStar {
             Gizmos.color = storedColor;
         }
 
-        private void SetStartNode(string tag) {
+        private void SetNode(string tag) {
             if (tag == startTag) {
                 this.map.start = this;
             }
+            if (tag == goalTag) {
+                this.map.goal = this;
+            }
+            this.nodeData = AStar.instance.RetrieveNodeData(tag);
         }
 
         private void UnassignNode() {
             if (this.map.start == this) {
                 this.map.start = null;
             }
-        }
-
-        private void SetEndNode(string tag) {
-            if (tag == goalTag) {
-                this.map.goal = this;
-            }
-        }
-
-        private void UnassignEndNode() {
             if (this.map.goal == this) {
                 this.map.goal = null;
             }
+            this.nodeData = null;
         }
 
         private void OnTriggerEnter2D(Collider2D other) {
-            this.nodeData = AStar.instance.RetrieveNodeData(other.tag);
-            SetStartNode(other.tag);
-            SetEndNode(other.tag);
+            SetNode(other.tag);
         }
 
         private void OnTriggerStay2D(Collider2D other) {
-            if (this.nodeData != null && other.tag != nodeData.tag) {
-                this.nodeData = AStar.instance.RetrieveNodeData(other.tag);
-                SetStartNode(other.tag);
-                SetEndNode(other.tag);
-            }
+            if (nodeData != null && other.tag == nodeData.tag) return;
+            SetNode(other.tag);
         }
 
         private void OnTriggerExit2D(Collider2D other) {
-            if (nodeData != null && other.CompareTag(this.nodeData.tag)) {
-                this.nodeData = null;
-                UnassignNode();
-                UnassignEndNode();
-            }
+            UnassignNode();
         }
     }
 }
