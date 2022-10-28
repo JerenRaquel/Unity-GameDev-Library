@@ -17,3 +17,45 @@
 5. [**Recommended**] Create an empty object and attach ObjectTravelHandler.cs to it.
     - This will allow for object movement by lerping at some speed between the two distances.
     - This should provide an easy way for moving objects by the pathfinder to some location.
+
+# Example
+```csharp
+using UnityEngine;
+
+public class AIController : MonoBehaviour
+{
+    public AStar.Pathfinder pathfinder;
+    public Transform enemy;
+    [Header("Settings")]
+    public bool AIState = false;
+    public float speed;
+
+    private bool isMoving = false;
+
+    private void Update() {
+        if(AIState) {   // Check if the AI is enabled.
+            if(!isMoving){  // Make sure the AI isn't already moving
+                Vector3? nextPosition = pathfinder.GetNextPosition();
+                // Return if no path was found.
+                if(!nextPosition.HasValue) return;  
+                isMoving = true;
+                MoveTowards(nextPosition.Value);
+            }
+        }
+    }
+
+    private void MoveTowards(Vector3 position) {
+        // Create travel args for the enemy.
+        ObjectTravel.TravelDataArgs args = new ObjectTravel.TravelDataArgs(
+            enemy, 
+            // Set the movement flag to get the next position
+            () => { isMoving = false; },    
+            enemy.position,
+            position,
+            speed
+        );
+        // Request the movement
+        ObjectTravel.ObjectTravelHandler.instance.RequestTravel(args);
+    }
+}
+```
