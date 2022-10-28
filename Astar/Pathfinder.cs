@@ -40,13 +40,18 @@ namespace AStar {
             }
         }
 
-        public Vector3? getNextPosition() {
+        public List<Vector2> GetPath() {
+            return AStar.instance.FindPath(
+                ref map, ref map.start, ref map.goal
+            );
+        }
+
+        public Vector3? GetNextPosition() {
             List<Vector2> path = AStar.instance.FindPath(
                 ref map, ref map.start, ref map.goal
             );
-            if (path == null || path.Count == 0) {
-                return null;
-            } else if (path.Count == 1) {
+            if (path == null || path.Count == 0) return null;
+            if (path.Count == 1) {
                 return map.goal.position;
             } else {
                 return path[0];

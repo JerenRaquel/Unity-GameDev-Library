@@ -120,7 +120,6 @@ namespace AStar {
         }
 
         private void OnTriggerStay2D(Collider2D other) {
-            if (nodeData != null && other.tag == nodeData.tag) return;
             SetNode(other.tag);
         }
 

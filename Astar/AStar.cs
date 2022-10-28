@@ -109,7 +109,7 @@ namespace AStar {
                         ref cameFrom, ref openSet, ref current, ref neighbor, ref goal);
                 }
             }
-            // ! FAILURE
+            Debug.LogError("AStar::FindPath: AStar Failure");
             return null;
         }
 
@@ -148,7 +148,8 @@ namespace AStar {
 
         private void CalculateNeighborWeights(
             ref Dictionary<Node, Node> cameFrom, ref MinHeap<Node> openSet, ref Node current,
-            ref Node neighbor, ref Node goal) {
+            ref Node neighbor, ref Node goal
+        ) {
             float score = current.gcost + Heuristic(current, neighbor);
             if (score < neighbor.gcost) {
                 if (!cameFrom.ContainsKey(neighbor)) {
