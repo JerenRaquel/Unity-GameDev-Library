@@ -46,6 +46,13 @@ This is a file that provides basic tweening of objects needed to be moved from p
     - Works as a tweening library for translations and rotations.
     - [**Bug**] Rotation inaccurate from 360 degrees <-> 0 degrees.
 
+# How to use in your Unity project?
+Any provided prefabs are the basics of what is required to be used out of the box. Use at your own discretion.
+1. Clone this repo or download the zip file.
+2. Unzip the file.
+3. Drag anywhere within your assets folder in your Unity project.
+4. Wait for Unity to compile.
+
 # FAQ
 - Can I use this library or some of the scripts?
     - Sure, this is using the MIT license after all.
