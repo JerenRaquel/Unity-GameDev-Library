@@ -2,10 +2,15 @@
 Just some scripts, tools, and components to speed development up.
 
 # Features
+Every feature in its own folder should provide all that is needed in able to work right out of the box.
+
 ## Data Structures
+Types of data structures that C# does not already provide.
 - Minheap
     - [**Note**] Can be set in arguements to be used as a Maxheap instead.
+
 ## [Pathfinding: A*](https://github.com/JerenRaquel/Unity-GameDev-Library/blob/master/Astar/README.md) [**Prefabs Provided**]
+Your standard A* pathfinder using a grid based method. This pack provides the means to establish a grid of probes that will update their states based on what is within its space, and alert the corrisponding map for A*. A* then can be called on any map to generate the path if there is one.
 - [**Note**] Grid based A*.
 - [**Singleton**] AStar.cs
     - Main controller for handling global calculations and debugging settings.
@@ -17,7 +22,9 @@ Just some scripts, tools, and components to speed development up.
 - Pathfinder.cs
     - Handles node creation.
     - Calls the global A* script to find its path.
+
 ## [TextSystem](https://github.com/JerenRaquel/Unity-GameDev-Library/blob/master/Text%20Scroller/README.md)
+This is a pack that provides auto character by character display of text. Can be used for speech bubbles, dialogue boxes, or for cutscene text.
 - [**Note**] Requires TextMeshPro.
 - [**Note**] Make sure your textbox is big enough to fit your entire text in.
 - FontData.cs
@@ -31,8 +38,11 @@ Just some scripts, tools, and components to speed development up.
     - Controller for creating the scrolling text.
     - Allows for timed character by character display according to settings in TextData.
     - Allows for skipping the timed delay and displaying the entire text within the text box.
+
 ## [Tween](https://github.com/JerenRaquel/Unity-GameDev-Library/blob/master/Tween/README.md) [**Prefabs Provided**]
+This is a file that provides basic tweening of objects needed to be moved from point A to B or rotated from X to Y.
 - [**Singleton**] ObjectTravelHandler.cs
+    - Lerp and Slerp are the methods for tweening.
     - Works as a tweening library for translations and rotations.
     - [**Bug**] Rotation inaccurate from 360 degrees <-> 0 degrees.
 
