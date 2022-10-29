@@ -1,5 +1,5 @@
-# Unity-GameDev-Library 2.0
-Just some scripts, tools, and components to speed development up.
+# Unity Game Development Library 2.0
+Just some scripts, tools, and components to speed development up. The 2.0 version is updated and more efficent version of the previous version. The 1.0 version is deprecated and is under its own branch if needed.
 
 # Features
 Every feature in its own folder should provide all that is needed in able to work right out of the box.
