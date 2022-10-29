@@ -1,4 +1,5 @@
 # How to Use
+- [**Note**] A prefab has been provided with no changes necessary.
 1. Create an empty gameobject and attach this script to it.
     - [**Note**] This script is a singleton, so there can only be one of it.
 2. Create the travel args and set its parameters.

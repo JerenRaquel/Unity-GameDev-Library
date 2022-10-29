@@ -1,4 +1,5 @@
 # How to Use
+- [**Note**] Prefabs have been provided. Make sure your objects' tags are set to the correct ones and have rigidbody2Ds with their desired collider2Ds.
 1. Create an empty object and attach AStar.cs to it.
     - There can only be one of these objects at a time.
     - This object is a singleton which can be called from anywhere even across active scenes.
