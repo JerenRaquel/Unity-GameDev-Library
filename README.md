@@ -17,6 +17,20 @@ Just some scripts, tools, and components to speed development up.
 - Pathfinder.cs
     - Handles node creation.
     - Calls the global A* script to find its path.
+## [TextSystem](https://github.com/JerenRaquel/Unity-GameDev-Library/blob/master/Text%20Scroller/README.md)
+- [**Note**] Requires TextMeshPro.
+- [**Note**] Make sure your textbox is big enough to fit your entire text in.
+- FontData.cs
+    - Establish how you want text rendered.
+- TextData.cs
+    - Apply your FontData to parts of text.
+    - The combined result of these parts will be the entire text displayed in the TextMeshPro text box.
+- TextParser.cs
+    - Helper for text system.
+- TextScroller.cs
+    - Controller for creating the scrolling text.
+    - Allows for timed character by character display according to settings in TextData.
+    - Allows for skipping the timed delay and displaying the entire text within the text box.
 ## [Tween](https://github.com/JerenRaquel/Unity-GameDev-Library/blob/master/Tween/README.md) [**Prefabs Provided**]
 - [**Singleton**] ObjectTravelHandler.cs
     - Works as a tweening library for translations and rotations.
