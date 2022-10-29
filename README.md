@@ -5,7 +5,7 @@ Just some scripts, tools, and components to speed development up.
 ## Data Structures
 - Minheap
     - [**Note**] Can be set in arguements to be used as a Maxheap instead.
-## [Pathfinding: A*](https://github.com/JerenRaquel/Unity-GameDev-Library/blob/master/Astar/README.md)
+## [Pathfinding: A*](https://github.com/JerenRaquel/Unity-GameDev-Library/blob/master/Astar/README.md) [**Prefabs Provided**]
 - [**Note**] Grid based A*.
 - [**Singleton**] AStar.cs
     - Main controller for handling global calculations and debugging settings.
@@ -17,7 +17,7 @@ Just some scripts, tools, and components to speed development up.
 - Pathfinder.cs
     - Handles node creation.
     - Calls the global A* script to find its path.
-## [Tween](https://github.com/JerenRaquel/Unity-GameDev-Library/blob/master/Tween/README.md)
+## [Tween](https://github.com/JerenRaquel/Unity-GameDev-Library/blob/master/Tween/README.md) [**Prefabs Provided**]
 - [**Singleton**] ObjectTravelHandler.cs
     - Works as a tweening library for translations and rotations.
     - [**Bug**] Rotation inaccurate from 360 degrees <-> 0 degrees.
