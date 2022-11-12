@@ -23,6 +23,12 @@ Your standard A* pathfinder using a grid based method. This pack provides the me
     - Handles node creation.
     - Calls the global A* script to find its path.
 
+## [Random Weighted Generator]()
+A simple random generator that supports weighted values. This uses a string ballot method where the values are stringed together and evaluated by threshold.
+- RandomWeightedGenerator.cs
+    - Handles generating the value and returns a string of the value.
+- WeightedValues.cs
+    - [**Note**] Do not attach this to anything.
 ## [TextSystem](https://github.com/JerenRaquel/Unity-GameDev-Library/blob/master/Text%20Scroller/README.md)
 This is a pack that provides auto character by character display of text. Can be used for speech bubbles, dialogue boxes, or for cutscene text.
 - [**Note**] Requires TextMeshPro.
