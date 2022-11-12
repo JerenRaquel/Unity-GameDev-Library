@@ -23,7 +23,7 @@ Your standard A* pathfinder using a grid based method. This pack provides the me
     - Handles node creation.
     - Calls the global A* script to find its path.
 
-## [Random Weighted Generator]()
+## [Random Weighted Generator](https://github.com/JerenRaquel/Unity-GameDev-Library/blob/master/RWG/README.md)
 A simple random generator that supports weighted values. This uses a string ballot method where the values are stringed together and evaluated by threshold.
 - RandomWeightedGenerator.cs
     - Handles generating the value and returns a string of the value.
