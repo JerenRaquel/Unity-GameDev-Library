@@ -15,7 +15,7 @@ namespace WaveFunctionCollapse {
         private int tilesInSuperPostion;
         private Vector2Int gridSize;
 
-        private void Initialize(Vector2Int gridSize) {
+        public void Initialize(Vector2Int gridSize) {
             this.cellDict = new Dictionary<string, CellData>();
             this.ruleDict = new Dictionary<string, RuleData>();
             this.tiles = new TileData[gridSize.x * gridSize.y];
@@ -117,11 +117,9 @@ namespace WaveFunctionCollapse {
             int entropyLevelBefore = tileData.EntropyLevel;
             UpdateTileBasedOnRule(tileData);
 
-            if (tileData.EntropyLevel != entropyLevelBefore) {
-                if (entropyLevelBefore == 1) {
-                    tileData.MarkAsCollapsed();
-                    this.tilesInSuperPostion--;
-                }
+            if (entropyLevelBefore == 1) {
+                tileData.MarkAsCollapsed();
+                this.tilesInSuperPostion--;
                 return true;
             }
 

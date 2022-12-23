@@ -81,9 +81,7 @@ namespace WaveFunctionCollapse {
         }
 
         public string GetValueAndRemove(int index) {
-            if (index >= this.possibleCells.Count) {
-                Debug.LogException(new System.Exception("Index Out Of Bounds"));
-            }
+            if (index >= this.possibleCells.Count) return null;
 
             string value = this.possibleCells[index];
             this.possibleCells.Remove(value);
@@ -138,9 +136,9 @@ namespace WaveFunctionCollapse {
             int[] surroundingCellIndices
                 = Helpers.ConvertSurroundingCoordinates(center, gridWidth);
             foreach (int i in surroundingCellIndices) {
-                if (i < 0) continue;
+                if (i < 0 || i >= tiles.Length) continue;
 
-                if (!updatingTiles.Find(tiles[i]) && !tiles[i].collapsed) {
+                if (!updatingTiles.IsEmpty() && !updatingTiles.Find(tiles[i]) && !tiles[i].collapsed) {
                     updatingTiles.Add(tiles[i]);
                 }
             }
