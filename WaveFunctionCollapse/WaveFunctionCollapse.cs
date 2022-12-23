@@ -7,23 +7,21 @@ namespace WaveFunctionCollapse {
         [SerializeField] private RuleData[] rules;
 
         // Internal Data //
+        private Queue<Sprite> spawnedSprites;
         private Dictionary<string, CellData> cellDict;
         private Dictionary<string, RuleData> ruleDict;
-        private MinHeap<TileData> updatingTiles;
+        private Stack<TileData> updatingTiles;
         private List<string> allCellNames;
         private TileData[] tiles;
         private int tilesInSuperPostion;
         private Vector2Int gridSize;
 
         public void Initialize(Vector2Int gridSize) {
+            this.spawnedSprites = new Queue<Sprite>();
             this.cellDict = new Dictionary<string, CellData>();
             this.ruleDict = new Dictionary<string, RuleData>();
             this.tiles = new TileData[gridSize.x * gridSize.y];
-            this.updatingTiles = new MinHeap<TileData>(
-                this.gridSize.x * this.gridSize.y,
-                (TileData LHS, TileData RHS) => LHS.EntropyLevel < RHS.EntropyLevel,
-                (TileData LHS, TileData RHS) => LHS.EntropyLevel == RHS.EntropyLevel
-            );
+            this.updatingTiles = new Stack<TileData>();
             this.allCellNames = new List<string>();
             this.gridSize = gridSize;
 
@@ -45,17 +43,18 @@ namespace WaveFunctionCollapse {
             }
         }
 
-        public Sprite GenerateCell() {
-            if (this.tilesInSuperPostion <= 0) return null;
-
+        public void Generate() {
             // Find lowest entropy
             TileData lowestEntropyTile = FetchLowestEntropyTile();
             // Collapse superposition
-            Sprite tile = CollapseTile(lowestEntropyTile);
+            CollapseTile(lowestEntropyTile);
             // Proprogate data
             ProprogateData(lowestEntropyTile.CellPosition);
+        }
 
-            return tile;
+        public Sprite GetNextTile() {
+            if (this.spawnedSprites.Count <= 0) return null;
+            return this.spawnedSprites.Dequeue();
         }
 
         private TileData FetchLowestEntropyTile() {
@@ -67,50 +66,46 @@ namespace WaveFunctionCollapse {
 
                 int currentTileEntropyLevel = this.tiles[i].EntropyLevel;
                 if (currentTileEntropyLevel < minEntropyLevel) {
-                    if (lowestIndices.Count > 0
-                        && this.tiles[lowestIndices[0]].EntropyLevel > currentTileEntropyLevel) {
-                        lowestIndices.Clear();
-                    }
+                    lowestIndices.Clear();
+                    lowestIndices.Add(i);
+                    minEntropyLevel = currentTileEntropyLevel;
+                } else if (currentTileEntropyLevel == minEntropyLevel) {
                     lowestIndices.Add(i);
                 }
             }
 
             if (lowestIndices.Count == 0) {
-                Debug.LogException(new System.Exception("UHHHHHHHHHHH"));
+                Debug.LogException(new System.Exception("No lower entropy than max int..."));
             }
 
             int rng = Random.Range(0, lowestIndices.Count);
             return this.tiles[lowestIndices[rng]];
         }
 
-        private Sprite CollapseTile(TileData tileData) {
+        private void CollapseTile(TileData tileData) {
             int rng = Random.Range(0, tileData.possibleCells.Count);
             string chosenCellData = tileData.GetValueAndRemove(rng);
-            tileData.MarkAsCollapsed();
-            this.tilesInSuperPostion--;
-            return this.cellDict[chosenCellData].tileSprite;
+            CollapseCell(tileData, this.cellDict[chosenCellData].tileSprite);
         }
 
         private void ProprogateData(Vector2Int origin) {
-            Helpers.AddNonExistingSurroundingTiles(
-                ref this.updatingTiles,
-                ref this.tiles,
-                origin,
-                this.gridSize.x
-            );
+            AddNonExistingSurroundingTiles(origin, this.gridSize.x);
 
-            while (!this.updatingTiles.IsEmpty()) {
+            while (this.updatingTiles.Count > 0) {
                 TileData tile = updatingTiles.Pop();
                 // Lower the entropy and add surroundings if entropy changed
                 if (LowerEntropy(tile)) {
-                    Helpers.AddNonExistingSurroundingTiles(
-                        ref this.updatingTiles,
-                        ref this.tiles,
-                        tile.CellPosition,
-                        this.gridSize.x
-                    );
+                    AddNonExistingSurroundingTiles(tile.CellPosition, this.gridSize.x);
                 }
             }
+        }
+
+        private void CollapseCell(TileData tileData, Sprite sprite) {
+            if (tileData.collapsed) return;
+
+            tileData.MarkAsCollapsed();
+            this.tilesInSuperPostion--;
+            this.spawnedSprites.Enqueue(sprite);
         }
 
         private bool LowerEntropy(TileData tileData) {
@@ -118,8 +113,7 @@ namespace WaveFunctionCollapse {
             UpdateTileBasedOnRule(tileData);
 
             if (entropyLevelBefore == 1) {
-                tileData.MarkAsCollapsed();
-                this.tilesInSuperPostion--;
+                CollapseCell(tileData, this.cellDict[tileData.tileName].tileSprite);
                 return true;
             }
 
@@ -142,6 +136,20 @@ namespace WaveFunctionCollapse {
                 }
                 return true;
             });
+        }
+
+        private void AddNonExistingSurroundingTiles(Vector2Int center, int gridWidth) {
+            int[] surroundingCellIndices
+                = Helpers.ConvertSurroundingCoordinates(center, gridWidth);
+            foreach (int i in surroundingCellIndices) {
+                if (i < 0 || i >= this.tiles.Length) continue;
+
+                if (this.updatingTiles.Count > 0
+                    && !this.updatingTiles.Contains(this.tiles[i])
+                    && !this.tiles[i].collapsed) {
+                    this.updatingTiles.Push(this.tiles[i]);
+                }
+            }
         }
     }
 }

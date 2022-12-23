@@ -39,7 +39,10 @@ namespace WaveFunctionCollapse {
         }
 
         public bool ContainsSearchInDirection(string key, int direction) {
-            return Helpers.ArrayContains<string>(GetRuleDirection(direction), key);
+            foreach (string item in GetRuleDirection(direction)) {
+                if (item == key) return true;
+            }
+            return false;
         }
 
         private string[] GetRuleDirection(int direction) {
@@ -95,7 +98,12 @@ namespace WaveFunctionCollapse {
                     newList.Add(cellName);
                 }
             }
-            this.possibleCells = newList;
+            if (newList.Count == 1) {
+                this.tileName = newList[0];
+                this.collapsed = true;
+            } else {
+                this.possibleCells = newList;
+            }
         }
 
         public void MarkAsCollapsed() {
@@ -119,36 +127,15 @@ namespace WaveFunctionCollapse {
 
         public static int[] ConvertSurroundingCoordinates(Vector2Int center, int gridWidth) {
             int[] result = new int[8];
-            result[0] = CellCoordinatesToIndex(center + new Vector2Int(-1, 1), gridWidth);
-            result[1] = CellCoordinatesToIndex(center + new Vector2Int(0, 1), gridWidth);
-            result[2] = CellCoordinatesToIndex(center + new Vector2Int(1, 1), gridWidth);
-            result[3] = CellCoordinatesToIndex(center + new Vector2Int(1, 0), gridWidth);
-            result[4] = CellCoordinatesToIndex(center + new Vector2Int(1, -1), gridWidth);
-            result[5] = CellCoordinatesToIndex(center + new Vector2Int(0, -1), gridWidth);
-            result[6] = CellCoordinatesToIndex(center + new Vector2Int(-1, -1), gridWidth);
-            result[7] = CellCoordinatesToIndex(center + new Vector2Int(-1, 0), gridWidth);
+            Vector2Int[] eightCells = {
+                new Vector2Int(-1, 1), new Vector2Int(0, 1), new Vector2Int(1, 1),
+                new Vector2Int(1, 0), new Vector2Int(1, -1), new Vector2Int(0, -1),
+                new Vector2Int(-1, -1), new Vector2Int(-1, 0),
+            };
+            for (int i = 0; i < 8; i++) {
+                result[i] = CellCoordinatesToIndex(center + eightCells[i], gridWidth);
+            }
             return result;
-        }
-
-        public static void AddNonExistingSurroundingTiles(
-            ref MinHeap<TileData> updatingTiles, ref TileData[] tiles, Vector2Int center,
-            int gridWidth) {
-            int[] surroundingCellIndices
-                = Helpers.ConvertSurroundingCoordinates(center, gridWidth);
-            foreach (int i in surroundingCellIndices) {
-                if (i < 0 || i >= tiles.Length) continue;
-
-                if (!updatingTiles.IsEmpty() && !updatingTiles.Find(tiles[i]) && !tiles[i].collapsed) {
-                    updatingTiles.Add(tiles[i]);
-                }
-            }
-        }
-
-        public static bool ArrayContains<T>(T[] array, T searchKey) {
-            foreach (T item in array) {
-                if (EqualityComparer<T>.Default.Equals(item, searchKey)) return true;
-            }
-            return false;
         }
     }
 }

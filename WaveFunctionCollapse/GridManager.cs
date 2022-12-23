@@ -25,11 +25,14 @@ namespace WaveFunctionCollapse {
         public void Initialize() {
             this.cells = new GameObject[this.gridSize.x * this.gridSize.y];
             this.wfc.Initialize(this.gridSize);
+            this.wfc.Generate();
             for (int i = 0; i < this.gridSize.x * this.gridSize.y; i++) {
-                Sprite tileSprite = this.wfc.GenerateCell();
+                Sprite tileSprite = this.wfc.GetNextTile();
                 if (tileSprite == null) {
-                    Debug.LogError("No Sprite Found");
+                    Debug.LogException(new System.Exception("No Sprite Found"));
+                    return;
                 }
+
                 Vector2Int coord = Helpers.IndexToCellCoordinate(i, this.gridSize.x);
                 this.cells[i] = Instantiate(
                     cellPrefab,
