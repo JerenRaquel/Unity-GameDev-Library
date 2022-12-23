@@ -23,14 +23,9 @@ namespace WaveFunctionCollapse {
 
         public int CalculateMaxEntropy() {
             int result = 0;
-            result += north.Length;
-            result += northEast.Length;
-            result += east.Length;
-            result += southEast.Length;
-            result += south.Length;
-            result += southWest.Length;
-            result += west.Length;
-            result += northWest.Length;
+            for (int i = 0; i < 8; i++) {
+                result += this[i].Length;
+            }
             return result;
         }
 
@@ -75,19 +70,29 @@ namespace WaveFunctionCollapse {
         public bool collapsed { get; private set; } = false;
         public string tileName { get; private set; } = null;
         public Vector2Int CellPosition { get; private set; }
-        public List<string> possibleCells { get; private set; }
-        public int EntropyLevel { get { return this.possibleCells.Count; } }
+        public int x { get { return this.CellPosition.x; } }
+        public int y { get { return this.CellPosition.y; } }
+        public string[] possibleCells { get; private set; }
+        public int EntropyLevel { get { return this.possibleCells.Length; } }
 
-        public TileData(Vector2Int cellPosition, List<string> allCellCopy) {
+        public TileData(Vector2Int cellPosition, ref string[] allCellCopy) {
             this.CellPosition = cellPosition;
-            this.possibleCells = allCellCopy;
+            this.possibleCells = new string[allCellCopy.Length];
+            for (int i = 0; i < allCellCopy.Length; i++) {
+                this.possibleCells[i] = allCellCopy[i];
+            }
         }
 
         public string GetValueAndRemove(int index) {
-            if (index >= this.possibleCells.Count) return null;
+            if (index >= this.possibleCells.Length) return null;
 
             string value = this.possibleCells[index];
-            this.possibleCells.Remove(value);
+            string[] newCells = new string[this.possibleCells.Length - 1];
+            for (int i = 0, c = 0; i < newCells.Length; i++) {
+                if (i != index) {
+                    newCells[c++] = this.possibleCells[i];
+                }
+            }
             return value;
         }
 
@@ -99,43 +104,19 @@ namespace WaveFunctionCollapse {
                 }
             }
             if (newList.Count == 1) {
-                this.tileName = newList[0];
-                this.collapsed = true;
+                MarkAsCollapsed(newList[0]);
             } else {
-                this.possibleCells = newList;
+                this.possibleCells = newList.ToArray();
             }
         }
 
         public void MarkAsCollapsed() {
+            MarkAsCollapsed(this.possibleCells[0]);
+        }
+
+        private void MarkAsCollapsed(string name) {
             this.collapsed = true;
-            this.tileName = this.possibleCells[0];
-        }
-    }
-
-    public static class Helpers {
-        public static Vector2Int IndexToCellCoordinate(int index, int gridWidth) {
-            return new Vector2Int(index / gridWidth, index % gridWidth);
-        }
-
-        public static int CellCoordinatesToIndex(int x, int y, int gridWidth) {
-            return gridWidth * y + x;
-        }
-
-        public static int CellCoordinatesToIndex(Vector2Int coord, int gridWidth) {
-            return CellCoordinatesToIndex(coord.x, coord.y, gridWidth);
-        }
-
-        public static int[] ConvertSurroundingCoordinates(Vector2Int center, int gridWidth) {
-            int[] result = new int[8];
-            Vector2Int[] eightCells = {
-                new Vector2Int(-1, 1), new Vector2Int(0, 1), new Vector2Int(1, 1),
-                new Vector2Int(1, 0), new Vector2Int(1, -1), new Vector2Int(0, -1),
-                new Vector2Int(-1, -1), new Vector2Int(-1, 0),
-            };
-            for (int i = 0; i < 8; i++) {
-                result[i] = CellCoordinatesToIndex(center + eightCells[i], gridWidth);
-            }
-            return result;
+            this.tileName = name;
         }
     }
 }

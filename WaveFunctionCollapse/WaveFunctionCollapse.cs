@@ -8,26 +8,24 @@ namespace WaveFunctionCollapse {
 
         // Internal Data //
         private Queue<Sprite> spawnedSprites;
-        private Dictionary<string, CellData> cellDict;
+        private Dictionary<string, Sprite> cellDict;
         private Dictionary<string, RuleData> ruleDict;
         private Stack<TileData> updatingTiles;
-        private List<string> allCellNames;
-        private TileData[] tiles;
+        private string[] allCellNames;
+        private Grid<TileData> tiles;
         private int tilesInSuperPostion;
-        private Vector2Int gridSize;
 
         public void Initialize(Vector2Int gridSize) {
             this.spawnedSprites = new Queue<Sprite>();
-            this.cellDict = new Dictionary<string, CellData>();
+            this.cellDict = new Dictionary<string, Sprite>();
             this.ruleDict = new Dictionary<string, RuleData>();
-            this.tiles = new TileData[gridSize.x * gridSize.y];
+            this.tiles = new Grid<TileData>(gridSize.x, gridSize.y);
             this.updatingTiles = new Stack<TileData>();
-            this.allCellNames = new List<string>();
-            this.gridSize = gridSize;
+            this.allCellNames = new string[this.cellData.Length];
 
-            foreach (CellData cd in this.cellData) {
-                this.cellDict.Add(cd.name, cd);
-                this.allCellNames.Add(cd.name);
+            for (int i = 0; i < this.cellData.Length; i++) {
+                this.cellDict.Add(this.cellData[i].name, this.cellData[i].tileSprite);
+                this.allCellNames[i] = this.cellData[i].name;
             }
 
             foreach (RuleData rule in this.rules) {
@@ -37,8 +35,7 @@ namespace WaveFunctionCollapse {
             this.tilesInSuperPostion = gridSize.x * gridSize.y;
             for (int y = 0; y < gridSize.y; y++) {
                 for (int x = 0; x < gridSize.x; x++) {
-                    this.tiles[Helpers.CellCoordinatesToIndex(x, y, gridSize.x)]
-                        = new TileData(new Vector2Int(x, y), this.allCellNames);
+                    this.tiles[x, y] = new TileData(new Vector2Int(x, y), ref this.allCellNames);
                 }
             }
         }
@@ -83,19 +80,19 @@ namespace WaveFunctionCollapse {
         }
 
         private void CollapseTile(TileData tileData) {
-            int rng = Random.Range(0, tileData.possibleCells.Count);
+            int rng = Random.Range(0, tileData.EntropyLevel);
             string chosenCellData = tileData.GetValueAndRemove(rng);
-            CollapseCell(tileData, this.cellDict[chosenCellData].tileSprite);
+            CollapseCell(tileData, this.cellDict[chosenCellData]);
         }
 
         private void ProprogateData(Vector2Int origin) {
-            AddNonExistingSurroundingTiles(origin, this.gridSize.x);
+            AddNonExistingSurroundingTiles(origin.x, origin.y, this.tiles.x);
 
             while (this.updatingTiles.Count > 0) {
                 TileData tile = updatingTiles.Pop();
                 // Lower the entropy and add surroundings if entropy changed
                 if (LowerEntropy(tile)) {
-                    AddNonExistingSurroundingTiles(tile.CellPosition, this.gridSize.x);
+                    AddNonExistingSurroundingTiles(tile.x, tile.y, this.tiles.x);
                 }
             }
         }
@@ -113,7 +110,7 @@ namespace WaveFunctionCollapse {
             UpdateTileBasedOnRule(tileData);
 
             if (entropyLevelBefore == 1) {
-                CollapseCell(tileData, this.cellDict[tileData.tileName].tileSprite);
+                CollapseCell(tileData, this.cellDict[tileData.tileName]);
                 return true;
             }
 
@@ -121,8 +118,7 @@ namespace WaveFunctionCollapse {
         }
 
         private void UpdateTileBasedOnRule(TileData tileData) {
-            int[] surroundingCells
-                = Helpers.ConvertSurroundingCoordinates(tileData.CellPosition, this.gridSize.x);
+            int[] surroundingCells = this.tiles.GetSurroundingCellIndices(tileData.x, tileData.y);
             tileData.KeepPossibleCells((string possibleCellName) => {
                 for (int dir = 0; dir < 8; dir++) {
                     int tileIndex = surroundingCells[dir];
@@ -138,17 +134,15 @@ namespace WaveFunctionCollapse {
             });
         }
 
-        private void AddNonExistingSurroundingTiles(Vector2Int center, int gridWidth) {
-            int[] surroundingCellIndices
-                = Helpers.ConvertSurroundingCoordinates(center, gridWidth);
-            foreach (int i in surroundingCellIndices) {
+        private void AddNonExistingSurroundingTiles(int x, int y, int gridWidth) {
+            int[] surroundingCells = this.tiles.GetSurroundingCellIndices(x, y);
+            foreach (int i in surroundingCells) {
                 if (i < 0 || i >= this.tiles.Length) continue;
-
                 if (this.updatingTiles.Count > 0
-                    && !this.updatingTiles.Contains(this.tiles[i])
-                    && !this.tiles[i].collapsed) {
-                    this.updatingTiles.Push(this.tiles[i]);
-                }
+                    && this.updatingTiles.Contains(this.tiles[i])) continue;
+                if (this.tiles[i].collapsed) continue;
+
+                this.updatingTiles.Push(this.tiles[i]);
             }
         }
     }

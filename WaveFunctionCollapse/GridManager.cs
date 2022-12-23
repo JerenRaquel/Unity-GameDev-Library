@@ -33,10 +33,10 @@ namespace WaveFunctionCollapse {
                     return;
                 }
 
-                Vector2Int coord = Helpers.IndexToCellCoordinate(i, this.gridSize.x);
+                Grid<TileData>.ConvertIndexToCoordinate(i, this.gridSize.x, out int x, out int y);
                 this.cells[i] = Instantiate(
                     cellPrefab,
-                    new Vector3(coord.x, coord.y, 0) * cellWidth,
+                    new Vector3(x, y, 0) * cellWidth,
                     Quaternion.identity,
                     transform
                 );

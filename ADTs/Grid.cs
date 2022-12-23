@@ -1,4 +1,5 @@
 public class Grid<T> {
+    #region Variables
     // Consts
     public delegate void Enerumerator(T item);
     private int[,] eightCells = {
@@ -11,12 +12,14 @@ public class Grid<T> {
     public int Length { get { return data.Length; } }
     public int x {
         get {
-            return (int)System.MathF.Floor((float)this.Length / (float)this.width);
+            ConvertIndexToCoordinate(this.Length, this.width, out int result, out int _);
+            return result;
         }
     }
     public int y {
         get {
-            return (int)System.MathF.Floor((float)this.Length % (float)this.width);
+            ConvertIndexToCoordinate(this.Length, this.width, out int _, out int result);
+            return result;
         }
     }
 
@@ -24,6 +27,7 @@ public class Grid<T> {
     private int width;
     private int height;
     private T[] data;
+    #endregion Variables
 
     public Grid(int width, int height) {
         this.width = width;
@@ -38,16 +42,42 @@ public class Grid<T> {
     }
 
     public T this[int x, int y] {
-        get { return this[this.width * y + x]; }
-        set { this[this.width * y + x] = value; }
+        get { return this[FlattenCoordinate(x, y, this.width)]; }
+        set { this[FlattenCoordinate(x, y, this.width)] = value; }
     }
     #endregion Operator Overloading
+
+    #region Static Methods
+    public static int FlattenCoordinate(int x, int y, int width) {
+        return width * y + x;
+    }
+
+    public static void ConvertIndexToCoordinate(int i, int width, out int x, out int y) {
+        x = (int)System.MathF.Floor((float)i / (float)width);
+        y = i % width;
+    }
+    #endregion Static Methods
 
     #region Member Methods
     public T[] GetSurroundingCells(int x, int y) {
         T[] surroundingCells = new T[8];
         for (int i = 0; i < 8; i++) {
-            surroundingCells[i] = this[eightCells[i, 0], eightCells[i, 1]];
+            int dx = eightCells[i, 0];
+            int dy = eightCells[i, 1];
+
+            if (dx < 0 || dx >= this.x) continue;
+            if (dy < 0 || dy >= this.y) continue;
+
+            surroundingCells[i] = this[dx, dy];
+        }
+        return surroundingCells;
+    }
+
+    public int[] GetSurroundingCellIndices(int x, int y) {
+        int[] surroundingCells = new int[8];
+        for (int i = 0; i < 8; i++) {
+            surroundingCells[i]
+                = FlattenCoordinate(eightCells[i, 0], eightCells[i, 1], this.width);
         }
         return surroundingCells;
     }
