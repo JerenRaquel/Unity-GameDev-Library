@@ -1,7 +1,10 @@
+using System;
+using WaveFunctionCollapse;
+
 public class Grid<T> {
     #region Variables
     // Consts
-    public delegate void Enerumerator(T item);
+    public delegate void Enerumerator(in T item);
     private int[,] eightCells = {
         {-1, 1}, {0, 1}, {1, 1},
         {1, 0}, {1, -1}, {0, -1},
@@ -73,6 +76,21 @@ public class Grid<T> {
         return surroundingCells;
     }
 
+    public K[] GetSurroundingCellData<K>(int x, int y, K fillerVar, Func<T, K> accessor) {
+        K[] gatheredData = new K[8];
+        for (int i = 0; i < 8; i++) {
+            int dx = eightCells[i, 0];
+            int dy = eightCells[i, 1];
+
+            if (dx < 0 || dx >= this.x || dy < 0 || dy >= this.y) {
+                gatheredData[i] = fillerVar;
+            }
+
+            gatheredData[i] = accessor(this[dx, dy]);
+        }
+        return gatheredData;
+    }
+
     public int[] GetSurroundingCellIndices(int x, int y) {
         int[] surroundingCells = new int[8];
         for (int i = 0; i < 8; i++) {
@@ -84,7 +102,7 @@ public class Grid<T> {
 
     public void ForEach(Enerumerator function) {
         foreach (T item in this.data) {
-            function(item);
+            function(in item);
         }
     }
     #endregion Member Methods
