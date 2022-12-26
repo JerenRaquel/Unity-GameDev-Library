@@ -83,19 +83,6 @@ namespace WaveFunctionCollapse {
             }
         }
 
-        public string GetValueAndRemove(int index) {
-            if (index >= this.possibleCells.Length) return null;
-
-            string value = this.possibleCells[index];
-            string[] newCells = new string[this.possibleCells.Length - 1];
-            for (int i = 0, c = 0; i < newCells.Length; i++) {
-                if (i != index) {
-                    newCells[c++] = this.possibleCells[i];
-                }
-            }
-            return value;
-        }
-
         public void KeepPossibleCells(Conditional conditional) {
             List<string> newList = new List<string>();
             foreach (string cellName in this.possibleCells) {
@@ -110,13 +97,30 @@ namespace WaveFunctionCollapse {
             }
         }
 
-        public void MarkAsCollapsed() {
-            MarkAsCollapsed(this.possibleCells[0]);
+        public void Collapse() {
+            int rng = UnityEngine.Random.Range(0, this.EntropyLevel);
+            string chosenCellData = this.GetValueAndRemove(rng);
+            MarkAsCollapsed(chosenCellData);
         }
+
+        public static string NameAccessor(TileData tile) { return tile.tileName; }
 
         private void MarkAsCollapsed(string name) {
             this.collapsed = true;
             this.tileName = name;
+        }
+
+        private string GetValueAndRemove(int index) {
+            if (index >= this.possibleCells.Length) return null;
+
+            string value = this.possibleCells[index];
+            string[] newCells = new string[this.possibleCells.Length - 1];
+            for (int i = 0, c = 0; i < newCells.Length; i++) {
+                if (i != index) {
+                    newCells[c++] = this.possibleCells[i];
+                }
+            }
+            return value;
         }
     }
 }

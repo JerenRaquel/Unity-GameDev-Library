@@ -54,7 +54,10 @@ public class GroupedMinHeap<T> {
 
         int key = this.keys.Peek();
         int amt = this.data[key].Count;
-        int rngIndex = this.rng.Next(0, amt + 1);
+        if (amt == 0) {
+            throw new System.Exception("UnSynced Data");
+        }
+        int rngIndex = this.rng.Next(0, amt);
         return this.data[key][rngIndex];
     }
 
