@@ -6,6 +6,7 @@ using System.Collections.Generic;
     Notes: The initial purpose of this data structure is to hold a group of items for a "key" 
         acting as an ID. However, the keys are organized in min ordered by ID. The ID is defined
         on the size of each element. Each group will be fetched by random order from that group.
+        This was made with Wave Function Collapse in mind.
 
     Docs:
         For the constructor:
@@ -17,7 +18,8 @@ using System.Collections.Generic;
         Pop(): Returns a random T from the smallest group and removes it from the group, 
             if applicable
         Add(T): Adds to a group
-        Find(T): returns true if T was found
+        Find(T): Returns true if T was found
+        Update(): Reorders the internals; lazy calculation [Plans for eager calculations]
 */
 
 public class GroupedMinHeap<T> {
@@ -92,5 +94,29 @@ public class GroupedMinHeap<T> {
         return !this.keys.Every((in int key) => {
             return !this.data[key].Contains(item);
         });
+    }
+
+    public void Update() {
+        GroupedMinHeap<T> newGroupedMinHeap = new GroupedMinHeap<T>(
+            this.maxKeySize, this.lengthIdentifier
+        );
+
+        // Copy keys
+        int[] oldKeys = new int[this.keys.Count];
+        int count = 0;
+        this.keys.ForEach((in int key) => {
+            oldKeys[count] = key;
+            count++;
+        });
+
+        foreach (int key in oldKeys) {
+            foreach (T item in this.data[key]) {
+                newGroupedMinHeap.Add(item);
+            }
+        }
+
+        this.Count = newGroupedMinHeap.Count;
+        this.data = newGroupedMinHeap.data;
+        this.keys = newGroupedMinHeap.keys;
     }
 }

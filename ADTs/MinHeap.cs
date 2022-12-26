@@ -19,12 +19,13 @@
       Pop(): Returns the smallest T in the heap and removes it from the heap, if applicable
       Add(T): Adds to the heap
       Find(T): returns true if T was found in the heap
-      ForEach(Accessor accessor(in T)): Apply a function on each element; every element is immutable
+      ForEach(Iterator accessor(in T)): Apply a function on each element; every element is immutable
       Every(Accessor accessor(in T)): Apply a conditional function on each immutable element; stop on the first false state
  */
 
 public class MinHeap<T> {
     public delegate bool Comparator(T lhs, T rhs);
+    public delegate void Iterator(in T item);
     public delegate bool Accessor(in T item);
 
     private Comparator _comparatorLess;
@@ -101,7 +102,7 @@ public class MinHeap<T> {
         return false;
     }
 
-    public void ForEach(Accessor accessor) {
+    public void ForEach(Iterator accessor) {
         for (int i = 0; i < _size; i++) {
             accessor(_elements[i]);
         }
