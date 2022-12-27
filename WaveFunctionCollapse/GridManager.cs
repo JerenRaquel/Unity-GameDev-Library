@@ -12,12 +12,12 @@ namespace WaveFunctionCollapse {
         [SerializeField] private GameObject cellPrefab;
 
         [Header("Debugging Options")]
-        [SerializeField] private bool createOnStartUp = false;
-        [SerializeField] private bool nextTile = false;
-        [SerializeField] private float delay;
-        private float current;
-        private int count = 0;
-        private int max;
+        [HideInInspector] public bool enableDebugging = false;
+        [HideInInspector] public bool createOnStartUp = false;
+        [HideInInspector] public bool createAllAtOnce = false;
+        [HideInInspector] public bool nextTile = false;
+        [HideInInspector] public int count { get; private set; } = 0;
+        [HideInInspector] public int max { get; private set; }
 
         // Internals //
         private WaveFunctionCollapse wfc;
@@ -25,6 +25,7 @@ namespace WaveFunctionCollapse {
 
         private void Start() {
             this.wfc = GetComponent<WaveFunctionCollapse>();
+            this.max = this.gridSize.x * gridSize.y;
             if (this.createOnStartUp) Initialize();
         }
 
@@ -32,20 +33,17 @@ namespace WaveFunctionCollapse {
             this.cells = new GameObject[this.gridSize.x * this.gridSize.y];
             this.wfc.Initialize(this.gridSize);
             this.wfc.Generate();
-            this.max = this.gridSize.x * gridSize.y;
-        }
-
-        private void Update() {
-            if (this.count < this.max
-                && this.nextTile && this.current <= Time.time + this.delay) {
-                this.nextTile = false;
-                this.current = Time.time;
-                Generate(this.count);
-                this.count++;
+            if (this.createAllAtOnce) {
+                for (int i = 0; i < this.max; i++) {
+                    PlaceNextTile();
+                }
             }
         }
 
-        private void Generate(int index) {
+        public void PlaceNextTile() {
+            this.nextTile = false;
+            int index = this.count;
+            this.count++;
             Sprite tileSprite = this.wfc.GetNextTile();
                 if (tileSprite == null) {
                     Debug.LogException(new System.Exception("No Sprite Found"));
@@ -61,6 +59,12 @@ namespace WaveFunctionCollapse {
             );
             this.cells[index].GetComponent<SpriteRenderer>().sprite = tileSprite;
             this.cells[index].name = tileSprite.name;
+        }
+
+        public void PlaceRest() {
+            while (this.count < this.max) {
+                PlaceNextTile();
+            }
         }
     }
 }
