@@ -10,38 +10,41 @@ namespace WaveFunctionCollapse {
         [SerializeField] private Vector2Int gridOffset;
         [SerializeField] private float cellWidth;
         [SerializeField] private GameObject cellPrefab;
-
-        [Header("Debugging Options")]
-        [HideInInspector] public bool enableDebugging = false;
-        [HideInInspector] public bool createOnStartUp = false;
-        [HideInInspector] public bool createAllAtOnce = false;
-        [HideInInspector] public bool nextTile = false;
-        [HideInInspector] public int count { get; private set; } = 0;
-        [HideInInspector] public int max { get; private set; }
-
-        // Internals //
-        private WaveFunctionCollapse wfc;
-        private GameObject[] cells;
-
-        private void Start() {
-            this.wfc = GetComponent<WaveFunctionCollapse>();
-            this.max = this.gridSize.x * gridSize.y;
-            if (this.createOnStartUp) Initialize();
-        }
-
-        public void Initialize() {
-            this.cells = new GameObject[this.gridSize.x * this.gridSize.y];
-            this.wfc.Initialize(this.gridSize);
-            this.wfc.Generate();
-            if (this.createAllAtOnce) {
-                for (int i = 0; i < this.max; i++) {
-                    PlaceNextTile();
+        [HideInInspector]
+        public bool Complete {
+            get {
+                if (this.cells == null) {
+                    return false;
+                } else {
+                    return this.count >= this.cells.Length;
                 }
             }
         }
 
+        [Header("Debugging Options")]
+        [HideInInspector] public bool enableDebugging = false;
+        [HideInInspector] public bool disableDebugButtons = false;
+        [HideInInspector] public float tilePlacementDelayDebug;
+
+        private int count = 0;
+
+        // Internals //
+        private WaveFunctionCollapse wfc;
+        private Grid<GameObject> cells;
+
+        private void Start() {
+            this.wfc = GetComponent<WaveFunctionCollapse>();
+            Initialize();
+        }
+
+        public void Initialize() {
+            this.cells = new Grid<GameObject>(this.gridSize.x, this.gridSize.y);
+            this.wfc.Initialize(this.gridSize);
+            this.wfc.Generate();
+        }
+
         public void PlaceNextTile() {
-            this.nextTile = false;
+            if (this.Complete) return;
             int index = this.count;
             this.count++;
             Sprite tileSprite = this.wfc.GetNextTile();
@@ -62,9 +65,16 @@ namespace WaveFunctionCollapse {
         }
 
         public void PlaceRest() {
-            while (this.count < this.max) {
+            StartCoroutine(_PlaceRest());
+        }
+
+        private IEnumerator _PlaceRest() {
+            this.disableDebugButtons = true;
+            while (!this.Complete) {
                 PlaceNextTile();
+                yield return new WaitForSeconds(this.tilePlacementDelayDebug);
             }
+            this.disableDebugButtons = false;
         }
     }
 }
