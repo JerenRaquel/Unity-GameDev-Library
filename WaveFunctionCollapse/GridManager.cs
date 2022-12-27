@@ -7,11 +7,17 @@ namespace WaveFunctionCollapse {
     public class GridManager : MonoBehaviour {
         [Header("Settings")]
         [SerializeField] private Vector2Int gridSize;
+        [SerializeField] private Vector2Int gridOffset;
         [SerializeField] private float cellWidth;
         [SerializeField] private GameObject cellPrefab;
 
         [Header("Debugging Options")]
         [SerializeField] private bool createOnStartUp = false;
+        [SerializeField] private bool nextTile = false;
+        [SerializeField] private float delay;
+        private float current;
+        private int count = 0;
+        private int max;
 
         // Internals //
         private WaveFunctionCollapse wfc;
@@ -26,23 +32,35 @@ namespace WaveFunctionCollapse {
             this.cells = new GameObject[this.gridSize.x * this.gridSize.y];
             this.wfc.Initialize(this.gridSize);
             this.wfc.Generate();
-            for (int i = 0; i < this.gridSize.x * this.gridSize.y; i++) {
-                Sprite tileSprite = this.wfc.GetNextTile();
+            this.max = this.gridSize.x * gridSize.y;
+        }
+
+        private void Update() {
+            if (this.count < this.max
+                && this.nextTile && this.current <= Time.time + this.delay) {
+                this.nextTile = false;
+                this.current = Time.time;
+                Generate(this.count);
+                this.count++;
+            }
+        }
+
+        private void Generate(int index) {
+            Sprite tileSprite = this.wfc.GetNextTile();
                 if (tileSprite == null) {
                     Debug.LogException(new System.Exception("No Sprite Found"));
                     return;
                 }
 
-                Grid<TileData>.ConvertIndexToCoordinate(i, this.gridSize.x, out int x, out int y);
-                this.cells[i] = Instantiate(
-                    cellPrefab,
-                    new Vector3(x, y, 0) * cellWidth,
-                    Quaternion.identity,
-                    transform
-                );
-                this.cells[i].GetComponent<SpriteRenderer>().sprite = tileSprite;
-                this.cells[i].name = tileSprite.name;
-            }
+            Grid<TileData>.ConvertIndexToCoordinate(index, this.gridSize.x, out int x, out int y);
+            this.cells[index] = Instantiate(
+                cellPrefab,
+                new Vector3(x + this.gridOffset.x, y + this.gridOffset.y, 0) * cellWidth,
+                Quaternion.identity,
+                transform
+            );
+            this.cells[index].GetComponent<SpriteRenderer>().sprite = tileSprite;
+            this.cells[index].name = tileSprite.name;
         }
     }
 }

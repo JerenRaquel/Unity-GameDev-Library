@@ -8,62 +8,6 @@ namespace WaveFunctionCollapse {
         public Sprite tileSprite;
     }
 
-    [System.Serializable]
-    public class RuleData {
-        public string CellName;
-        [Header("Allowable Adjacent Cells")]
-        public string[] north;
-        public string[] northEast;
-        public string[] east;
-        public string[] southEast;
-        public string[] south;
-        public string[] southWest;
-        public string[] west;
-        public string[] northWest;
-
-        public int CalculateMaxEntropy() {
-            int result = 0;
-            for (int i = 0; i < 8; i++) {
-                result += this[i].Length;
-            }
-            return result;
-        }
-
-        public string[] this[int i] {
-            get { return GetRuleDirection(i); }
-        }
-
-        public bool ContainsSearchInDirection(string key, int direction) {
-            foreach (string item in GetRuleDirection(direction)) {
-                if (item == key) return true;
-            }
-            return false;
-        }
-
-        private string[] GetRuleDirection(int direction) {
-            switch (direction) {
-                case 0:
-                    return this.north;
-                case 1:
-                    return this.northEast;
-                case 2:
-                    return this.east;
-                case 3:
-                    return this.southEast;
-                case 4:
-                    return this.south;
-                case 5:
-                    return this.southWest;
-                case 6:
-                    return this.west;
-                case 7:
-                    return this.northWest;
-                default:
-                    return null;
-            }
-        }
-    }
-
     public class TileData {
         public bool collapsed { get; private set; } = false;
         public string tileName { get; private set; } = null;

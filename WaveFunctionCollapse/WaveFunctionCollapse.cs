@@ -102,20 +102,13 @@ namespace WaveFunctionCollapse {
             }
         }
 
-        private bool KeepDecider(string tileName, string[] surroundingTileNames) {
-            for (int i = 0; i < surroundingTileNames.Length; i++) {
-                if (surroundingTileNames[i] == null) continue;
+        private bool KeepDecider(string self, string[] neighbors) {
+            for (int i = 0; i < neighbors.Length; i++) {
+                if (neighbors[i] == null) continue; // Tile isn't collapsed
 
-                bool canExist
-                    = this.ruleDict[tileName].ContainsSearchInDirection(
-                        surroundingTileNames[i], i
-                    );
-                if (!canExist) {
-                    Debug.Log(tileName + " can not be with " + surroundingTileNames[i]);
-                    return false;
-                }
+                bool canExist = this.ruleDict[self].CanBeNeighbor(neighbors[i], i);
+                if (!canExist) return false;
             }
-
             return true;
         }
     }
