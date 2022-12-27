@@ -65,8 +65,6 @@ namespace WaveFunctionCollapse {
     }
 
     public class TileData {
-        public delegate bool Conditional(string cellName);
-
         public bool collapsed { get; private set; } = false;
         public string tileName { get; private set; } = null;
         public Vector2Int CellPosition { get; private set; }
@@ -83,7 +81,7 @@ namespace WaveFunctionCollapse {
             }
         }
 
-        public void KeepPossibleCells(Conditional conditional) {
+        public void KeepPossibleCells(System.Func<string, bool> conditional) {
             List<string> newList = new List<string>();
             foreach (string cellName in this.possibleCells) {
                 if (conditional(cellName)) {

@@ -1,5 +1,4 @@
 using System;
-using WaveFunctionCollapse;
 
 public class Grid<T> {
     #region Variables
@@ -65,11 +64,11 @@ public class Grid<T> {
     public T[] GetSurroundingCells(int x, int y) {
         T[] surroundingCells = new T[8];
         for (int i = 0; i < 8; i++) {
-            int dx = eightCells[i, 0];
-            int dy = eightCells[i, 1];
+            int dx = eightCells[i, 0] + x;
+            int dy = eightCells[i, 1] + y;
 
-            if (dx < 0 || dx >= this.x) continue;
-            if (dy < 0 || dy >= this.y) continue;
+            if (dx < 0 || dx >= this.width) continue;
+            if (dy < 0 || dy >= this.height) continue;
 
             surroundingCells[i] = this[dx, dy];
         }
@@ -79,14 +78,14 @@ public class Grid<T> {
     public K[] GetSurroundingCellData<K>(int x, int y, K fillerVar, Func<T, K> accessor) {
         K[] gatheredData = new K[8];
         for (int i = 0; i < 8; i++) {
-            int dx = eightCells[i, 0];
-            int dy = eightCells[i, 1];
+            int dx = eightCells[i, 0] + x;
+            int dy = eightCells[i, 1] + y;
 
-            if (dx < 0 || dx >= this.x || dy < 0 || dy >= this.y) {
+            if (dx < 0 || dx >= this.width || dy < 0 || dy >= this.height) {
                 gatheredData[i] = fillerVar;
+            } else {
+                gatheredData[i] = accessor(this[dx, dy]);
             }
-
-            gatheredData[i] = accessor(this[dx, dy]);
         }
         return gatheredData;
     }

@@ -55,12 +55,15 @@ namespace WaveFunctionCollapse {
             while (this.groupedTiles.Count > 0) {
                 // Find lowest entropy
                 TileData lowestEntropyTile = this.groupedTiles.Pop();
-                // Collapse superposition
-                CollapseTile(lowestEntropyTile);
 
-                // Proprogate data
-                AddSurroundingTiles(lowestEntropyTile.x, lowestEntropyTile.y);
-                ProprogateData();
+                if (!lowestEntropyTile.collapsed) {
+                    // Collapse superposition
+                    CollapseTile(lowestEntropyTile);
+                    // Proprogate data
+                    AddSurroundingTiles(lowestEntropyTile.x, lowestEntropyTile.y);
+                    ProprogateData();
+                    this.groupedTiles.Update();
+                }
             }
         }
 
@@ -85,30 +88,36 @@ namespace WaveFunctionCollapse {
         private void ProprogateData() {
             while (this.updatingTiles.Count > 0) {
                 TileData tile = this.updatingTiles.Pop();
+                if (tile == null) {
+                    throw new System.Exception("Popped Invalid Tile!");
+                }
 
                 string[] surroundingTileNames
                     = this.tiles.GetSurroundingCellData<string>(
-                        tile.x,
-                        tile.y,
-                        null,
-                        TileData.NameAccessor
+                        tile.x, tile.y, null, TileData.NameAccessor);
+
+                tile.KeepPossibleCells((string cellName) => {
+                    return KeepDecider(cellName, surroundingTileNames);
+                });
+            }
+        }
+
+        //! BUGS
+        private bool KeepDecider(string tileName, string[] surroundingTileNames) {
+            for (int i = 0; i < surroundingTileNames.Length; i++) {
+                if (surroundingTileNames[i] == null) continue;
+
+                bool canExist
+                    = this.ruleDict[tileName].ContainsSearchInDirection(
+                        surroundingTileNames[i], i
                     );
-
-                for (int i = 0; i < surroundingTileNames.Length; i++) {
-                    if (surroundingTileNames[i] == null) continue;
-
-                    tile.KeepPossibleCells((string cellName) => {
-                        return this.ruleDict[cellName].ContainsSearchInDirection(
-                            surroundingTileNames[i], i
-                        );
-                    });
-                }
-
-                if (tile.collapsed) {
-                    AddSurroundingTiles(tile.x, tile.y);
-                    this.spawnedSprites.Enqueue(this.cellDict[tile.tileName]);
+                if (!canExist) {
+                    Debug.Log(tileName + " can not be with " + surroundingTileNames[i]);
+                    return false;
                 }
             }
+
+            return true;
         }
     }
 }
