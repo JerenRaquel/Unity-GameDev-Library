@@ -102,7 +102,6 @@ namespace WaveFunctionCollapse {
             }
         }
 
-        //! BUGS
         private bool KeepDecider(string tileName, string[] surroundingTileNames) {
             for (int i = 0; i < surroundingTileNames.Length; i++) {
                 if (surroundingTileNames[i] == null) continue;
