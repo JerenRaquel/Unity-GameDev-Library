@@ -35,7 +35,6 @@ namespace WaveFunctionCollapse {
             SerializedProperty baseObj = serializedObject.FindProperty(name);
             EditorGUILayout.LabelField(Fancify(name));
             EditorGUI.indentLevel++;
-            EditorGUILayout.PropertyField(baseObj.FindPropertyRelative("includeSelf"), true);
             EditorGUILayout.PropertyField(baseObj.FindPropertyRelative("data"), true);
             EditorGUI.indentLevel--;
         }

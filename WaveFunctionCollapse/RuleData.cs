@@ -5,7 +5,6 @@ namespace WaveFunctionCollapse {
     public class RuleData : ScriptableObject {
         [System.Serializable]
         public class RuleDirection {
-            public bool includeSelf;
             [SerializeField] public string[] data;
             public int Length { get { return data.Length; } }
             public bool isValid { get { return (this.data != null); } }
@@ -36,7 +35,7 @@ namespace WaveFunctionCollapse {
 
         public bool CanBeNeighbor(string neighbor, int direction) {
             RuleDirection ruleDirection = GetRuleDirection(direction);
-            if (neighbor == this.CellName && ruleDirection.includeSelf) {
+            if (neighbor == this.CellName) {
                 return true;
             }
 
