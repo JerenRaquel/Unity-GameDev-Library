@@ -8,6 +8,17 @@ namespace WaveFunctionCollapse {
         public Sprite tileSprite;
     }
 
+    [System.Serializable]
+    public class WFCResultData {
+        public Sprite sprite;
+        public Vector2Int gridPosition;
+
+        public WFCResultData(Sprite sprite, Vector2Int gridPosition) {
+            this.sprite = sprite;
+            this.gridPosition = gridPosition;
+        }
+    }
+
     public class TileData {
         public bool collapsed { get; private set; } = false;
         public string tileName { get; private set; } = null;
@@ -25,7 +36,7 @@ namespace WaveFunctionCollapse {
             }
         }
 
-        public void KeepPossibleCells(System.Func<string, bool> conditional) {
+        public bool KeepPossibleCells(System.Func<string, bool> conditional) {
             List<string> newList = new List<string>();
             foreach (string cellName in this.possibleCells) {
                 if (conditional(cellName)) {
@@ -34,8 +45,10 @@ namespace WaveFunctionCollapse {
             }
             if (newList.Count == 1) {
                 MarkAsCollapsed(newList[0]);
+                return true;
             } else {
                 this.possibleCells = newList.ToArray();
+                return false;
             }
         }
 

@@ -47,21 +47,19 @@ namespace WaveFunctionCollapse {
             if (this.Complete) return;
             int index = this.count;
             this.count++;
-            Sprite tileSprite = this.wfc.GetNextTile();
-                if (tileSprite == null) {
-                    Debug.LogException(new System.Exception("No Sprite Found"));
+            WFCResultData tileData = this.wfc.GetNextTile();
+            if (tileData == null) {
+                Debug.LogException(new System.Exception("No Data Found"));
                     return;
                 }
 
-            Grid<TileData>.ConvertIndexToCoordinate(index, this.gridSize.x, out int x, out int y);
-            this.cells[index] = Instantiate(
-                cellPrefab,
-                new Vector3(x + this.gridOffset.x, y + this.gridOffset.y, 0) * cellWidth,
-                Quaternion.identity,
-                transform
-            );
-            this.cells[index].GetComponent<SpriteRenderer>().sprite = tileSprite;
-            this.cells[index].name = tileSprite.name;
+            Vector3 pos = new Vector3(
+                    tileData.gridPosition.x + this.gridOffset.x,
+                    tileData.gridPosition.y + this.gridOffset.y, 0
+                ) * cellWidth;
+            this.cells[index] = Instantiate(cellPrefab, pos, Quaternion.identity, transform);
+            this.cells[index].GetComponent<SpriteRenderer>().sprite = tileData.sprite;
+            this.cells[index].name = tileData.sprite.name + "( " + pos.x + ", " + pos.y + " )";
         }
 
         public void PlaceRest() {

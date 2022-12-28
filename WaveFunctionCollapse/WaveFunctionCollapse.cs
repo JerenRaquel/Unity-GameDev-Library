@@ -8,7 +8,7 @@ namespace WaveFunctionCollapse {
         [SerializeField] private RuleData[] rules;
 
         // Internal Data //
-        private Queue<Sprite> spawnedSprites;
+        private Queue<WFCResultData> spawnedData;
         private Dictionary<string, Sprite> cellDict;
         private Dictionary<string, RuleData> ruleDict;
         private Grid<TileData> tiles;
@@ -17,7 +17,7 @@ namespace WaveFunctionCollapse {
         private Stack<TileData> updatingTiles;
 
         public void Initialize(Vector2Int gridSize) {
-            this.spawnedSprites = new Queue<Sprite>();
+            this.spawnedData = new Queue<WFCResultData>();
             this.cellDict = new Dictionary<string, Sprite>();
             this.ruleDict = new Dictionary<string, RuleData>();
             this.tiles = new Grid<TileData>(gridSize.x, gridSize.y);
@@ -46,9 +46,9 @@ namespace WaveFunctionCollapse {
             }
         }
 
-        public Sprite GetNextTile() {
-            if (this.spawnedSprites.Count <= 0) return null;
-            return this.spawnedSprites.Dequeue();
+        public WFCResultData GetNextTile() {
+            if (this.spawnedData.Count <= 0) return null;
+            return this.spawnedData.Dequeue();
         }
 
         public void Generate() {
@@ -71,7 +71,10 @@ namespace WaveFunctionCollapse {
             if (tileData.collapsed) return;
 
             tileData.Collapse();
-            this.spawnedSprites.Enqueue(this.cellDict[tileData.tileName]);
+            this.spawnedData.Enqueue(new WFCResultData(
+                this.cellDict[tileData.tileName],
+                tileData.CellPosition
+            ));
         }
 
         private void AddSurroundingTiles(int x, int y) {
@@ -96,7 +99,7 @@ namespace WaveFunctionCollapse {
                     = this.tiles.GetSurroundingCellData<string>(
                         tile.x, tile.y, null, TileData.NameAccessor);
 
-                tile.KeepPossibleCells((string cellName) => {
+                bool collapsed = tile.KeepPossibleCells((string cellName) => {
                     return KeepDecider(cellName, surroundingTileNames);
                 });
             }
