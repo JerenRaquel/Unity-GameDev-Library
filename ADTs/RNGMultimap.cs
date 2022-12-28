@@ -13,6 +13,9 @@ public class RNGMultimap<K, V> {
     }
 
     public void Add(K key, V value) {
+        if (key == null) throw new ArgumentNullException("Null Key");
+        if (value == null) throw new ArgumentNullException("Null Value");
+
         if (!this.ContainsKey(key)) {
             this.data.Add(key, new List<V>());
         }
@@ -28,6 +31,9 @@ public class RNGMultimap<K, V> {
 
     public V this[K key] {
         get {
+            if (key == null) throw new ArgumentException("Key can't be null");
+            if (!ContainsKey(key)) throw new IndexOutOfRangeException("Invalid Key: " + key);
+
             int index = this.rng.Next(0, this.data[key].Count);
             return this.data[key][index];
         }
@@ -42,5 +48,15 @@ public class RNGMultimap<K, V> {
             }
         }
         return false;
+    }
+
+    public K[] GetKeys() {
+        K[] keys = new K[this.data.Keys.Count];
+        int i = 0;
+        foreach (K key in this.data.Keys) {
+            keys[i] = key;
+            i++;
+        }
+        return keys;
     }
 }
