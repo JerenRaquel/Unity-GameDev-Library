@@ -12,18 +12,8 @@ public class Grid<T> {
 
     // Publics
     public int Length { get { return data.Length; } }
-    public int x {
-        get {
-            ConvertIndexToCoordinate(this.Length, this.width, out int result, out int _);
-            return result;
-        }
-    }
-    public int y {
-        get {
-            ConvertIndexToCoordinate(this.Length, this.width, out int _, out int result);
-            return result;
-        }
-    }
+    public int x { get { return this.width; } }
+    public int y { get { return this.height; } }
 
     // Privates
     private int width;
